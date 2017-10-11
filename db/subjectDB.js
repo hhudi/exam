@@ -26,19 +26,23 @@ module.exports = {
 		return pool.execute(sql);
 	},
 	updOneSubjects(data){
-		console.log(data);
 		var sql = 'update tbl_exam_subject set checkState="'+data.text+'" where id='+data.id;
 		return pool.execute(sql);
 	},
 	// 保存题目
-	/*saveSubject(subject){
-		var sql = "insert into tbl_exam_subject(analysis,answer,checkState,stem) values('"
+	
+	saveSubject(subject){
+		var sql = "insert into tbl_exam_subject values('"
 		+subject.analysis+"','"
 		+subject.answer+"','"
 		+subject.checkState+"','"
-		+subject.stem+"')";
+		+subject.stem+"','"
+		+subject.subjectType.id+"','"
+		+subject.subjectLevel.id+"','"
+		+subject.department.id+"','"
+		+subject.topic.id+"')";
 		return pool.execute(sql);
-	},*/
+	},
 	// 根据条件查找所有题目
 	getAllSubjects(typeId,lvId,depId,topId){
 		var sql = 'select * from tbl_exam_subject where subjectType_id="'
@@ -47,11 +51,26 @@ module.exports = {
 		+depId+'" and topic_id="'
 		+topId+'"';
 		return pool.execute(sql);
-	}
+	},
+	getChoices(cSub_id,sub_id){
+		// 题目id与选项id对应
+		var sql = 'select tbl_exam_choice.content,tbl_exam_choice.correct from tbl_exam_choice,tbl_exam_subject where tbl_exam_choice.subject_id='
+		+cSub_id+' AND tbl_exam_subject.id='+sub_id+' and tbl_exam_subject.id=tbl_exam_choice.subject_id';
+		return pool.execute(sql);
+	},
+	querySubject(keys){
+		var sql = 'select * from tbl_exam_subject where stem like "%'+keys+'%"';
+		return pool.execute(sql);
+	},
 	// 查找所有题目
 	/*getAllSubjects(){
 		var sql = 'select * from tbl_exam_subject';
 		return pool.execute(sql);
 	}*/
+	// 根据删除题目
+	delSubject(id){
+		var sql = 'delete from tbl_exam_subject where id='+id;
+		return pool.execute(sql);
+	}
 
 }

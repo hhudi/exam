@@ -54,9 +54,7 @@ route.post('/getOneSubjects',(req,resp)=>{
 	});
 });
 route.post('/updOneSubjects',(req,resp)=>{
-	console.log(req.body);
 	subjectDB.updOneSubjects(req.body).then(function(data){
-		console.log(data);
 		resp.send(data);
 	}).catch(function(error){
 		resp.send("报错了 ！"+error);
@@ -82,6 +80,29 @@ route.post('/getAllSubjects',(req,resp)=>{
 	var topId = ids[3];
 	console.log(typeId,lvId,depId,topId);
 	subjectDB.getAllSubjects(typeId,lvId,depId,topId).then(function(data){
+		resp.send(data);
+	}).catch(function(error){
+		resp.send("报错了 ！"+error);
+	});
+});
+route.post('/getChoices',(req,resp)=>{
+	subjectDB.getChoices(req.body.dataId,req.body.choiceId).then(function(data){
+		resp.send(data);
+	}).catch(function(error){
+		resp.send("报错了 ！"+error);
+	});
+});
+
+route.post('/delSubject',(req,resp)=>{
+	subjectDB.delSubject(req.body.id).then(function(data){
+		resp.send(data);
+	}).catch(function(error){
+		resp.send("报错了 ！"+error);
+	});
+});
+
+route.post('/querySubject/:keys',(req,resp)=>{
+	subjectDB.querySubject(req.body.keys).then(function(data){
 		resp.send(data);
 	}).catch(function(error){
 		resp.send("报错了 ！"+error);

@@ -1,8 +1,9 @@
 require('babel-polyfill');
 var subjectDB = require('./subjectDB');
 
-  var id = [4];
-  subjectDB.updOneSubjects('审核通过',id).then(function(data){
+  var cid = 2;
+  var sid = 2;
+  subjectDB.getChoices(cid,sid).then(function(data){
     console.log(data);
   }).catch(function(error){
     console.log("报错了 ！"+error);

@@ -43,7 +43,7 @@
               <div class="Catalogcontent">
                 <div class="Catalogcontentup">题干：&nbsp;&nbsp;</div>
                   <div class="CatalogContentMid" hidden="hidden">
-                    答案：<p id='answ'>answer</p>
+                    答案：<p id='answ'>null</p>
                     解析：<p id='analy'>analysis</p>
                   </div>
                   <div class="Catalogcontentdown">
@@ -88,8 +88,7 @@ $(function(){
       newTr.removeAttr("hidden");
       newTr.find(".chose").html("");
       newTr.children('td:eq(0)').html("难度");
-      data.forEach(function(item,index){
-                
+      data.forEach(function(item,index){     
         if(index==0){
           newTr.find('.chose').append("<a href='javascript:void(0)' id='"+item.id+"' name='"+item.name+"' class='active3'>"+item.realName+"</a>");
         }else{
@@ -180,6 +179,24 @@ $(function(){
                 'ContentType':'application/json',
                 success:function(data){
                   console.log("该题审核通过");
+                  var a = $('.Catalogtitwo[id='+id+']').next().children().eq(2).children();
+                  a.eq(0).css('display','none');
+                  a.eq(1).css('display','');
+                  a.eq(2).css('display','none');
+                  a.eq(3).css('display','none');
+                  /*var dataId = id;
+                  $.ajax('exam/manage/getOneSubjects',{
+                    data:{dataId},
+                    method:'POST',
+                    'ContentType':'application/json',
+                    success:function(data){
+                      console.log(data);
+                      data.forEach(function(item,index){
+                          console.log(item);
+
+                      });
+                    }
+                  });*/
                 }
               });
             }else if(text == '加入试卷'){
@@ -192,26 +209,40 @@ $(function(){
                 'ContentType':'application/json',
                 success:function(data){
                   console.log("该题审核不通过");
+                  var a = $('.Catalogtitwo[id='+id+']').next().children().eq(2).children();
+                  a.eq(0).css('display','');
+                  a.eq(1).css('display','none');
+                  a.eq(2).css('display','none');
+                  a.eq(3).css('display','');
                 }
               });
-            }else{
-              alert('删除题目');
+            }else if(text == '删除题目'){
+              console.log(id);
+              $.ajax('exam/manage/delSubject',{
+                data:{id},
+                method:'POST',
+                'ContentType':'application/json',
+                success:function(data){
+                  alert('删除成功');
+                  $('.chose a').eq(0).trigger('click');
+                }
+              });
             }
             event.preventDefault();
-            
-          });
 
-          // 显示答案与解析
+          });
+          
+          // 点击显示单个对应题目的答案与解析
           $('.Catalogcontentup').on('click',function(event){
-            console.log($('.Catalogtitle input:checkbox')[0].checked);
-            if($('.Catalogtitle input:checkbox')[0].checked != true){
-              $('.CatalogContentMid').removeAttr('hidden');
+            if($(this).next()[0].hidden == true){
+              $(this).next().removeAttr('hidden');
             }else{
-              $('.CatalogContentMid').attr('hidden','hidden');
+              $(this).next().attr('hidden','hidden');
             }
           });
+          
+          // 点击显示全部题目的答案与解析
           $('.Catalogtitle input:checkbox').on('click',function(event){
-            console.log($('.Catalogtitle input:checkbox')[0].checked);
             if($('.Catalogtitle input:checkbox')[0].checked == true){
               $('.CatalogContentMid').removeAttr('hidden');
             }else{
@@ -227,8 +258,39 @@ $(function(){
 
     // 点击查找
     $('.btn_gray').on('click',function(event){
-      alert(1);
+      var keys = $('.pl5 input').val();
+      $.ajax('exam/manage/querySubject/'+keys,{
+        data:{keys},
+        method:'POST',
+        'ContentType':'application/json',
+        success:function(data){
+          var cc = $('.Catalog').children().children();
+          // 清除原有题目
+          if(cc.length>2){
+            $('.Catalog_rightnei:hidden').nextAll().remove();
+          }
+          showAll(data);
+          // 点击显示单个对应题目的答案与解析
+          $('.Catalogcontentup').on('click',function(event){
+            if($(this).next()[0].hidden == true){
+              $(this).next().removeAttr('hidden');
+            }else{
+              $(this).next().attr('hidden','hidden');
+            }
+          });
+        }
+      });
     });
+
+
+    // 页面跳转 添加单个题目
+    $('.icon_add').on('click',function(enent){
+      $(location).attr('href', '../zy/1-3添加题目-单选题.html');
+    });
+    $('.icon_lead-in').on('click',function(enent){
+      alert(2);
+    });
+    
 
 });   // 边界
 
@@ -240,7 +302,6 @@ $(function(){
     data.forEach(function(item,index){
       var newDiv = $(".Catalog_rightnei:hidden").clone();
       newDiv.removeAttr('hidden');
-      console.log(item);
       newDiv.find('.Catalogtitwo').attr('id',''+item.id+'');
       newDiv.find('.Catalogtitwo').append("题号：'"
         +item.id+"'&nbsp;&nbsp;题型：'"
@@ -252,25 +313,86 @@ $(function(){
       newDiv.find('.Catalogcontentup').append(''+item.stem+'');
       
       $(".Catalog_right").append(newDiv);
-
       // 获取并填充答案与解析
       var dataId = item.id;
-      console.log(dataId);
+      var choiceId = dataId;
+      // 解析
       $.ajax('exam/manage/getOneSubjects',{
         data:{dataId},
         method:'POST',
         'ContentType':'application/json',
         success:function(oneData){
-          console.log(oneData);
           oneData.forEach(function(it,ind){
-              console.log(it);
-              newDiv.find('.CatalogContentMid #answ').html('');
-              newDiv.find('.CatalogContentMid #answ').html(it.answer);
+              var checkState_ = oneData[0].checkState;
+              
+              var a = $('.Catalogtitwo[id='+dataId+']').next().children().eq(2).children();
+              if(checkState_=='审核通过'){
+                a.eq(0).css('display','none');
+                a.eq(1).css('display','');
+                a.eq(2).css('display','none');
+                a.eq(3).css('display','none');
+              }else if(checkState_=='审核不通过'){
+                a.eq(0).css('display','');
+                a.eq(1).css('display','none');
+                a.eq(2).css('display','none');
+                a.eq(3).css('display','');
+              }
+              
+
               newDiv.find('.CatalogContentMid #analy').html('');
               newDiv.find('.CatalogContentMid #analy').html(it.analysis);
           });
         }
       });
+      // 答案
+      newDiv.find('.CatalogContentMid #answ').html('');
+      $.ajax('exam/manage/getChoices',{
+        data:{dataId,choiceId},
+        method:'POST',
+        'ContentType':'application/json',
+        success:function(mData){        
+          mData.forEach(function(it,ind){
+            console.log(it);
+            var newCont = '<dt>'+it.content+'</dt>'+'<br>';
+            newDiv.find('.CatalogContentMid #answ dt').css('display','inline');
+
+            if(ind==0){
+              ind = 'A';
+              newDiv.find('.CatalogContentMid #answ').append(ind+':'+newCont);
+              if(it.correct == 1){
+                $('.CatalogContentMid #answ dt:eq(0)').attr('id','correct');
+              }
+            }else if(ind==1){
+              ind = 'B';
+              newDiv.find('.CatalogContentMid #answ').append(ind+':'+newCont);
+              if(it.correct == 1){
+                $('.CatalogContentMid #answ dt:eq(1)').attr('id','correct');
+              }
+            }else if(ind==2){
+              ind = 'C';
+              newDiv.find('.CatalogContentMid #answ').append(ind+':'+newCont);
+              if(it.correct == 1){
+                $('.CatalogContentMid #answ dt:eq(2)').attr('id','correct');
+              }
+            }else if(ind==3){
+              ind = 'D';
+              newDiv.find('.CatalogContentMid #answ').append(ind+':'+newCont);
+              if(it.correct == 1){
+                $('.CatalogContentMid #answ dt:eq(3)').attr('id','correct');
+              }
+            }
+            if(it.correct == 1){
+              $('.CatalogContentMid #answ dt[id]').css('color','red');
+            }
+            
+          });
+
+        }
+      });
+
+
+
     });
   }
+
 </script>

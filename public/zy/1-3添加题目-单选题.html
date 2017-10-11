@@ -9,10 +9,14 @@
 <link rel="stylesheet" type="text/css" href="../theme/1/css/table.css">
 <link rel="stylesheet" type="text/css" href="../theme/1/css/icon.css">
 <link rel="stylesheet" type="text/css" href="../theme/1/css/zy.css">
-<script type="text/javascript" src="../js/jquery-1.8.2.min.js"></script>
-<script type="text/javascript" src="../js/jquery.easyui.min.js"></script>
-<script type="text/javascript"  src="../theme/1/js/base.js"></script>
+<script type="text/javascript" src="../theme/1/js/jquery-2.1.4/jquery.min.js"></script>
 </head>
+<style>
+    a{
+        border-radius: 
+    }
+</style>
+
 
 <body>
 <div class="main">
@@ -61,10 +65,27 @@
                     <div class="c_flex"><span class="c_flexible"></span></div>
                     <div class="Topictitle">添加题目</div>
                 	<div class="c_editview">
+                        <div class="problemAttr">
+                            <div class="Attributetit">题目属性</div>
+                            <div class="problemContentAttr">
+                                题型：<select name="typeName" id="typeId" class="subjectType">
+                                    
+                                </select>
+                                难度：<select name="levelName" id="levelId" class="subjectLevel">
+                                    
+                                </select>
+                                方向：<select name="departName" id="departId" class="department">
+                                    
+                                </select>
+                                知识点：<select name="topicName" id="topicId" class="topic">
+                                    
+                                </select>
+                            </div>
+                        </div>
                         <div class="Problem">
                             <div class="Attributetit">题目题干</div>
                             <div class="Problemcontent">
-                                
+                                <textarea class="problemStem"></textarea>
                             </div>
                         </div>
                         <div class="Answeroptions">
@@ -75,7 +96,8 @@
                                      <div class="Answerpart_left">
                                          <p>A</p><span><input type="radio" /></span>
                                      </div>
-                                     <div class="Answerpart_right"></div>
+                                     <div class="Answerpart_right">
+                                     </div>
                                      <div class="clear"></div>
                                   </div>
                                 <div class="Answerpart">
@@ -131,3 +153,66 @@
 </div>
 </body>
 </html>
+
+<script type="text/javascript">
+    $(function(){
+        $('.Problemcontent textarea').css('border','none');
+        $('.Problemcontent textarea').css('width','90%');
+        $('.Problemcontent textarea').css('minHeight','50px');
+        $('.Answerpart_right').append('<textarea cols="35" rows="5"></textarea>')
+
+        $('.Answerpart_right textarea').css('border','none');
+        $('.problemContentAttr select').css('margin-right','30px');
+        $('.problemContentAttr select').css('border-radius','3px');
+        $.getJSON('exam/manage/getAllSubjectType',function(data){
+            data.forEach(function(item,index){
+                var name = item.realName;
+                id = index+1;
+                var newOption = $('<option value='+name+' id='+id+'>'+name+'</option>');
+                $('.problemContentAttr select#typeId').append(newOption);
+            });
+        });
+        $.getJSON('exam/manage/getAllSubjectLevel',function(data){
+            data.forEach(function(item,index){
+                console.log(item)
+                var realName = item.realName;
+                id = index+1;
+                var newOption = $('<option value='+item.name+' id='+id+'>'+realName+'</option>');
+                $('.problemContentAttr select#levelId').append(newOption);
+            });
+        });
+        $.getJSON('exam/manage/getAllDepartmentes',function(data){
+            data.forEach(function(item,index){
+                console.log(item)
+                var name = item.name;
+                id = index+1;
+                var newOption = $('<option value='+name+' id='+id+'>'+name+'</option>');
+                $('.problemContentAttr select#departId').append(newOption);
+            });
+        });
+        $.getJSON('exam/manage/getAllTopics',function(data){
+            data.forEach(function(item,index){
+                console.log(item)
+                var name = item.title;
+                id = index+1;
+                var newOption = $('<option value='+name+' id='+id+'>'+name+'</option>');
+                $('.problemContentAttr select#topicId').append(newOption);
+            });
+        });
+
+        // 点击   保存并继续
+        $('.btn_left').children().eq(0).on('click',function(event){
+            var subTypeId = $('.problemContentAttr select#typeId option:selected')[0].id;
+            var subLevelId = $('.problemContentAttr select#levelId option:selected')[0].id;
+            var subDepartId = $('.problemContentAttr select#departId option:selected')[0].id;
+            var subTopicId = $('.problemContentAttr select#topicId option:selected')[0].id;
+            console.log(subTypeId,subLevelId,subDepartId,subTopicId);
+            var stem = $('.problemStem').val();
+            console.log(stem);
+        });
+        $('.btn_left').children().eq(1).on('click',function(event){
+            alert('exit');
+        });
+
+    });
+</script>
