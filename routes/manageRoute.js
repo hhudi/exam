@@ -60,16 +60,7 @@ route.post('/updOneSubjects',(req,resp)=>{
 		resp.send("报错了 ！"+error);
 	});
 });
-// 保存题目
-/*route.post('/saveSubject',(req,resp)=>{
-	let subject = new Subject();
-	Object.assign(subject,req.body);
-	subjectDB.saveSubject(subject).then(function(data){
-		resp.send(data);
-	}).catch(function(error){
-		resp.send("报错了 ！"+error);
-	});
-});*/
+
 // 查询所有题目信息
 route.post('/getAllSubjects',(req,resp)=>{
 	//console.log(JSON.parse(req.body.ids));
@@ -103,6 +94,37 @@ route.post('/delSubject',(req,resp)=>{
 
 route.post('/querySubject/:keys',(req,resp)=>{
 	subjectDB.querySubject(req.body.keys).then(function(data){
+		resp.send(data);
+	}).catch(function(error){
+		resp.send("报错了 ！"+error);
+	});
+});
+
+// 保存题目
+route.post('/saveSubject',(req,resp)=>{
+	subjectDB.saveSubject(req.body).then(function(data){
+		resp.send(data);
+	}).catch(function(error){
+		resp.send("报错了 ！"+error);
+	});
+});
+// 保存选项
+route.post('/saveChoices',(req,resp)=>{
+	console.log(req.body);
+	var content = req.body.content.split(',');
+	var correct = req.body.correct.split(',');
+	var id = req.body.id;
+
+	subjectDB.saveChoices(content,correct,id).then(function(data){
+		resp.send(data);
+	}).catch(function(error){
+		resp.send("报错了 ！"+error);
+	});
+});
+
+// 获取题目列表中的最大id
+route.get('/getMaxId',(req,resp)=>{
+	subjectDB.getMaxId().then(function(data){
 		resp.send(data);
 	}).catch(function(error){
 		resp.send("报错了 ！"+error);

@@ -183,20 +183,8 @@ $(function(){
                   a.eq(0).css('display','none');
                   a.eq(1).css('display','');
                   a.eq(2).css('display','none');
-                  a.eq(3).css('display','none');
-                  /*var dataId = id;
-                  $.ajax('exam/manage/getOneSubjects',{
-                    data:{dataId},
-                    method:'POST',
-                    'ContentType':'application/json',
-                    success:function(data){
-                      console.log(data);
-                      data.forEach(function(item,index){
-                          console.log(item);
-
-                      });
-                    }
-                  });*/
+                  a.eq(3).css('display','');
+                  
                 }
               });
             }else if(text == '加入试卷'){
@@ -322,6 +310,7 @@ $(function(){
         method:'POST',
         'ContentType':'application/json',
         success:function(oneData){
+          console.log(oneData);
           oneData.forEach(function(it,ind){
               var checkState_ = oneData[0].checkState;
               
@@ -330,65 +319,51 @@ $(function(){
                 a.eq(0).css('display','none');
                 a.eq(1).css('display','');
                 a.eq(2).css('display','none');
-                a.eq(3).css('display','none');
+                a.eq(3).css('display','');
               }else if(checkState_=='审核不通过'){
                 a.eq(0).css('display','');
                 a.eq(1).css('display','none');
                 a.eq(2).css('display','none');
                 a.eq(3).css('display','');
               }
-              
-
               newDiv.find('.CatalogContentMid #analy').html('');
               newDiv.find('.CatalogContentMid #analy').html(it.analysis);
           });
         }
       });
+
+
       // 答案
-      newDiv.find('.CatalogContentMid #answ').html('');
+      /*newDiv.find('.CatalogContentMid #answ').html('');
+      var countC = 65;
       $.ajax('exam/manage/getChoices',{
         data:{dataId,choiceId},
         method:'POST',
         'ContentType':'application/json',
-        success:function(mData){        
+        success:function(mData){   
           mData.forEach(function(it,ind){
-            console.log(it);
-            var newCont = '<dt>'+it.content+'</dt>'+'<br>';
+            console.log("it",it);
+            var newCont = '<dt>'+it.content+'</dt>'+'&nbsp;&nbsp;&nbsp;&nbsp;';
             newDiv.find('.CatalogContentMid #answ dt').css('display','inline');
+            for(var s=0;s<mData.length;s++){
+              console.log("s:",s)
+              if(ind==s){
+                ind = String.fromCharCode(countC+s);
+                newDiv.find('.CatalogContentMid #answ').append(ind+':'+newCont);
+                
+                if(it.correct == 1){
+                  console.log("correct:",s);
 
-            if(ind==0){
-              ind = 'A';
-              newDiv.find('.CatalogContentMid #answ').append(ind+':'+newCont);
-              if(it.correct == 1){
-                $('.CatalogContentMid #answ dt:eq(0)').attr('id','correct');
-              }
-            }else if(ind==1){
-              ind = 'B';
-              newDiv.find('.CatalogContentMid #answ').append(ind+':'+newCont);
-              if(it.correct == 1){
-                $('.CatalogContentMid #answ dt:eq(1)').attr('id','correct');
-              }
-            }else if(ind==2){
-              ind = 'C';
-              newDiv.find('.CatalogContentMid #answ').append(ind+':'+newCont);
-              if(it.correct == 1){
-                $('.CatalogContentMid #answ dt:eq(2)').attr('id','correct');
-              }
-            }else if(ind==3){
-              ind = 'D';
-              newDiv.find('.CatalogContentMid #answ').append(ind+':'+newCont);
-              if(it.correct == 1){
-                $('.CatalogContentMid #answ dt:eq(3)').attr('id','correct');
+                  $('.CatalogContentMid #answ dt:eq(s)').attr('id','correct');
+                }
+                console.log($('.CatalogContentMid #answ').find('dt'));
+                //$('.CatalogContentMid #answ dt#correct').css('color','red');
               }
             }
-            if(it.correct == 1){
-              $('.CatalogContentMid #answ dt[id]').css('color','red');
-            }
-            
           });
-
         }
-      });
+      });*/
+
 
 
 

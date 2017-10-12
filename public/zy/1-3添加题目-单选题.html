@@ -89,7 +89,7 @@
                             </div>
                         </div>
                         <div class="Answeroptions">
-                            <div class="Attributetit">答案选项<em>(通过勾选每个选项下面的框难吃时间点咳嗽打开)</em></div>
+                            <div class="Attributetit">答案<em>(勾选每个选项下面的框)</em></div>
                             <div class="c_condition"><span class="icon_add"><em class="icon_r" style="float: left">添加选项</em></span></div>
                             <div class="Answercontent">
                                   <div class="Answerpart">
@@ -128,18 +128,7 @@
                             <div class="Attributetit">答案解析</div>
                             <div class="Problemcontent"></div>
                         </div>
-                        <div class="Problem">
-                            <div class="fistproblm"><span>1.</span><a href="#"></a></div>
-                            <div class="Problemcontent"></div>
-                        </div>
-                        <div class="Problem">
-                            <div class="fistproblm"><span>1.</span><a href="#"></a></div>
-                            <div class="Problemcontent"></div>
-                        </div>
-                        <div class="Problem">
-                            <div class="fistproblm"><span>1.</span><a href="#"></a></div>
-                            <div class="Problemcontent"></div>
-                        </div>
+                        
                         <div class="btn_left">
                             <span class="btnL"><em class="btnR">保存并继续</em></span><span class="btnL"><em class="btnR">保存并关闭</em></span>
                         </div>
@@ -156,14 +145,22 @@
 
 <script type="text/javascript">
     $(function(){
-        $('.Problemcontent textarea').css('border','none');
-        $('.Problemcontent textarea').css('width','90%');
-        $('.Problemcontent textarea').css('minHeight','50px');
-        $('.Answerpart_right').append('<textarea cols="35" rows="5"></textarea>')
-
+        $('.Answerpart_right').append('<textarea cols="35" rows="5" class="choices"></textarea>');
+        $('.Attributetit').eq(3).next().append('<textarea cols="60" rows="4" id="analysis"></textarea>');
+        $('.Topictitle').append('<span class="exit"><img src="../theme/1/images/icon/ico_del.png" alt="退出" /></span>');
+        console.log($('.Topictitle span.exit img'));
+        $('.Topictitle span.exit img').css('float','right');
+        $('.Topictitle span.exit img').css('width','25px');
+        $('.Topictitle span.exit img').css('height','25px');
+        $('.Topictitle span.exit img').css('cursor','pointer');
         $('.Answerpart_right textarea').css('border','none');
         $('.problemContentAttr select').css('margin-right','30px');
         $('.problemContentAttr select').css('border-radius','3px');
+        $('.Problemcontent textarea').css('border','none');
+        $('.Problemcontent textarea').css('width','90%');
+        $('.Problemcontent textarea').css('minHeight','50px');
+
+        // 获取题型
         $.getJSON('exam/manage/getAllSubjectType',function(data){
             data.forEach(function(item,index){
                 var name = item.realName;
@@ -172,47 +169,187 @@
                 $('.problemContentAttr select#typeId').append(newOption);
             });
         });
+        // 获取题目难度
         $.getJSON('exam/manage/getAllSubjectLevel',function(data){
             data.forEach(function(item,index){
-                console.log(item)
                 var realName = item.realName;
                 id = index+1;
                 var newOption = $('<option value='+item.name+' id='+id+'>'+realName+'</option>');
                 $('.problemContentAttr select#levelId').append(newOption);
             });
         });
+        // 获取方向
         $.getJSON('exam/manage/getAllDepartmentes',function(data){
             data.forEach(function(item,index){
-                console.log(item)
                 var name = item.name;
                 id = index+1;
                 var newOption = $('<option value='+name+' id='+id+'>'+name+'</option>');
                 $('.problemContentAttr select#departId').append(newOption);
             });
         });
+        // 获取知识点
         $.getJSON('exam/manage/getAllTopics',function(data){
             data.forEach(function(item,index){
-                console.log(item)
                 var name = item.title;
                 id = index+1;
                 var newOption = $('<option value='+name+' id='+id+'>'+name+'</option>');
                 $('.problemContentAttr select#topicId').append(newOption);
             });
         });
-
+        // 根据题型不同加载不同页面
+        $('.problemContentAttr select#typeId').eq(0).on('click',function(event){
+            //console.log($(this));
+            var id = $('.problemContentAttr select#typeId option:selected')[0].id;
+            if(id == 1){
+                // 显示单选题页面
+                $('.Attributetit').eq(2).nextAll().removeAttr('hidden');
+                $('.Answercontent').next().attr('hidden','hidden');
+                $('.Attributetit').eq(2).siblings().eq(1).find('input').attr('type','radio');
+                if($('.Answerpart').length>4){
+                    location.reload();
+                }
+            }else if(id == 2){
+                // 显示复选题页面
+                $('.Attributetit').eq(2).nextAll().removeAttr('hidden');
+                $('.Answercontent').next().attr('hidden','hidden');
+                $('.Attributetit').eq(2).siblings().eq(1).find('input').attr('type','checkbox');
+                if($('.Answerpart').length>4){
+                    location.reload();
+                }
+            }else{
+                // 显示简答题页面
+                $('.Attributetit').eq(2).nextAll().attr('hidden','hidden');
+                var newDiv = $('.Attributetit').eq(1).next().clone();
+                newDiv.css('border','1px solid #ccc');
+                $('.Answeroptions').append(newDiv);
+            }
+        });
+        console.log();
+        // 添加选项
+        var count1 = 68;
+        $('.icon_add').on('click',function(event){
+            count1++;
+            newC = String.fromCharCode(count1);
+            var newChoice = $('.Answerpart').eq(3).clone();
+            console.log(newChoice.find('p').html(newC));
+            $('.Answercontent').append(newChoice);
+        });
+ 
         // 点击   保存并继续
         $('.btn_left').children().eq(0).on('click',function(event){
+            save();
+        });
+        $('.btn_left').children().eq(1).on('click',function(event){
+            save();
+            $(location).attr('href', '../index.html');
+        });
+
+        $('.Topictitle span.exit img').on('click',function(event){
+            $(location).attr('href', '../index.html');
+        });
+
+        function save(){
             var subTypeId = $('.problemContentAttr select#typeId option:selected')[0].id;
             var subLevelId = $('.problemContentAttr select#levelId option:selected')[0].id;
             var subDepartId = $('.problemContentAttr select#departId option:selected')[0].id;
             var subTopicId = $('.problemContentAttr select#topicId option:selected')[0].id;
             console.log(subTypeId,subLevelId,subDepartId,subTopicId);
             var stem = $('.problemStem').val();
-            console.log(stem);
-        });
-        $('.btn_left').children().eq(1).on('click',function(event){
-            alert('exit');
-        });
+            if(subTypeId == 1){
+                // 单选题
+                var val = $('.Answerpart_right textarea');
+                var ans = [];
+                var correct = [];
+                for(var i=0;i<val.length;i++){
+                    ans.push(val.eq(i).val());
+                    correct.push(+$('.Answerpart_left').find('input').eq(i)[0].checked);
+                }
+                var answer = ans.toString();
+                console.log(answer);
+            }else if(subTypeId == 2){
+                // 复选题
+                var val = $('.Answerpart_right textarea');
+                var ans = [];
+                var correct = [];
+                for(var i=0;i<val.length;i++){
+                    console.log(val.eq(i).val());
+                    ans.push(val.eq(i).val());
+                    correct.push(+$('.Answerpart_left').find('input').eq(i)[0].checked);
+                }
+                console.log(ans);
+                var answer = ans.toString();
+                console.log(answer);
+            }else{
+                // 简答题
+                var answer = $('.Attributetit').eq(2).nextAll().find('textarea.problemStem').val();
+            }
+            var analysis = $('#analysis').val();
+            // 本地时间格式转化
+            function add0(m){return m<10?'0'+m:m }
+            var date = new Date();
+            var y = date.getFullYear();
+            var m = date.getMonth()-1;
+            var d = date.getDate();
+            var h = date.getHours();
+            var mm = date.getMinutes();
+            var s = date.getSeconds();
+            var mydate = y+'-'+add0(m)+'-'+add0(d)+' '+add0(h)+':'+add0(mm)+':'+add0(s);
+            var subject = {
+                analysis:analysis,
+                answer:answer,
+                checkState:'未审核',
+                stem:stem,
+                uploadTime:mydate,
+                subjectType_id:subTypeId,
+                subjectLevel_id:subLevelId,
+                department_id:subDepartId,
+                topic_id:subTopicId,
+                user_id:null
+            }
+            console.log(correct);
+            if(subTypeId==1 || subTypeId==2){
+                var correct = correct.toString();
+                console.log(correct);
+                // 保存数据
+                $.ajax('exam/manage/saveSubject',{
+                    data:subject,
+                    method:'POST',
+                    'ContentType':'application/json',
+                    success:function(data){
+                        // 获取刚刚保存到数据库中题目的id
+                        $.getJSON('exam/manage/getMaxId',function(data){
+                            data.forEach(function(item,index){
+                                var id = item.id;
+                                console.log(id);
+                                var content = answer;
+                                // 将答案保存到选项表中
+                                $.ajax('exam/manage/saveChoices',{
+                                    data:{content:content,
+                                        correct:correct,
+                                        id:id},
+                                    method:'POST',
+                                    'ContentType':'application/json',
+                                    success:function(data){
+                                        console.log(data);
+                                    }
+                                });
+
+                            });
+                        });
+                    }
+                });
+            }else{
+                $.ajax('exam/manage/saveSubject',{
+                    data:subject,
+                    method:'POST',
+                    'ContentType':'application/json',
+                    success:function(data){
+                        console.log(data);
+                    }
+                });
+            }
+            location.reload("");
+        }
 
     });
 </script>

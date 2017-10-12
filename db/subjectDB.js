@@ -32,15 +32,29 @@ module.exports = {
 	// 保存题目
 	
 	saveSubject(subject){
-		var sql = "insert into tbl_exam_subject values('"
+		var sql = "insert into tbl_exam_subject values(null,'"
 		+subject.analysis+"','"
 		+subject.answer+"','"
 		+subject.checkState+"','"
 		+subject.stem+"','"
-		+subject.subjectType.id+"','"
-		+subject.subjectLevel.id+"','"
-		+subject.department.id+"','"
-		+subject.topic.id+"')";
+		+subject.uploadTime+"',"
+		+subject.department_id+","
+		+subject.subjectLevel_id+","
+		+subject.subjectType_id+","
+		+subject.topic_id+",null)";
+		return pool.execute(sql);
+	},
+	saveChoices(content,correct,sub_id){
+		console.log(content);
+		console.log(correct);
+		console.log(sub_id);
+		content.forEach(function(item,index){
+			var sql = 'insert into tbl_exam_choice values(null,"'+content[index]+'",'+correct[index]+','+sub_id+')';
+			return pool.execute(sql);
+		});
+	},
+	getMaxId(){
+		var sql = 'select max(id) id from tbl_exam_subject';
 		return pool.execute(sql);
 	},
 	// 根据条件查找所有题目
@@ -74,3 +88,5 @@ module.exports = {
 	}
 
 }
+
+
