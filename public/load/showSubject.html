@@ -244,7 +244,7 @@ $(function(){
     
 
 
-    // 点击查找
+    // 点击查找 题干关键字
     $('.btn_gray').on('click',function(event){
       var keys = $('.pl5 input').val();
       $.ajax('exam/manage/querySubject/'+keys,{
@@ -274,6 +274,7 @@ $(function(){
     // 页面跳转 添加单个题目
     $('.icon_add').on('click',function(enent){
       $(location).attr('href', '../zy/1-3添加题目-单选题.html');
+      //$(location).load('../zy/1-3添加题目-单选题.html');
     });
     $('.icon_lead-in').on('click',function(enent){
       alert(2);
@@ -287,6 +288,8 @@ $(function(){
     $('.Catalogtitwo').empty();
     $('.Catalogtitle em').html("");
     $('.Catalogtitle em').html(''+data.length+'');
+    // 获取题型id
+    var subjectTypeId = $('.tablea a[id][class=active3]').eq(0)[0].id;
     data.forEach(function(item,index){
       var newDiv = $(".Catalog_rightnei:hidden").clone();
       newDiv.removeAttr('hidden');
@@ -310,10 +313,9 @@ $(function(){
         method:'POST',
         'ContentType':'application/json',
         success:function(oneData){
-          console.log(oneData);
           oneData.forEach(function(it,ind){
+              // 根据审核状态改变按钮的显示
               var checkState_ = oneData[0].checkState;
-              
               var a = $('.Catalogtitwo[id='+dataId+']').next().children().eq(2).children();
               if(checkState_=='审核通过'){
                 a.eq(0).css('display','none');
@@ -326,47 +328,45 @@ $(function(){
                 a.eq(2).css('display','none');
                 a.eq(3).css('display','');
               }
+              // 显示解析
               newDiv.find('.CatalogContentMid #analy').html('');
               newDiv.find('.CatalogContentMid #analy').html(it.analysis);
           });
+          newDiv.find('.CatalogContentMid #answ').html('');
+          // 判断题型,然后显示答案
+          if(subjectTypeId==1 || subjectTypeId==2){
+            // 获取答案并展示
+            var countC = 65;
+            $.ajax('exam/manage/getChoices',{
+              data:{dataId,choiceId},
+              method:'POST',
+              'ContentType':'application/json',
+              success:function(mData){   
+                mData.forEach(function(it,ind){
+                  var newCont = '<dt>'+it.content+'</dt>'+'&nbsp;&nbsp;&nbsp;&nbsp;';
+                  if(it.correct.data[0] == 1){
+                    var newCont = '<dt id="correct">'+it.content+'</dt>'+'&nbsp;&nbsp;&nbsp;&nbsp;';
+                  }
+                  console.log();
+                  for(var s=0;s<mData.length;s++){
+                    // 展示选项 (A-Z)
+                    if(ind==s){
+                      ind = String.fromCharCode(countC+s);
+                      newDiv.find('.CatalogContentMid #answ').append(ind+':'+newCont);
+                    }
+                  }
+                  $('.CatalogContentMid #answ dt#correct').css('color','red');
+                  newDiv.find('.CatalogContentMid #answ dt').css('display','inline');
+                });
+              }
+            });
+          }else{
+            oneData.forEach(function(it,ind){
+              newDiv.find('.CatalogContentMid #answ').html(it.answer);
+            })
+          }
         }
       });
-
-
-      // 答案
-      /*newDiv.find('.CatalogContentMid #answ').html('');
-      var countC = 65;
-      $.ajax('exam/manage/getChoices',{
-        data:{dataId,choiceId},
-        method:'POST',
-        'ContentType':'application/json',
-        success:function(mData){   
-          mData.forEach(function(it,ind){
-            console.log("it",it);
-            var newCont = '<dt>'+it.content+'</dt>'+'&nbsp;&nbsp;&nbsp;&nbsp;';
-            newDiv.find('.CatalogContentMid #answ dt').css('display','inline');
-            for(var s=0;s<mData.length;s++){
-              console.log("s:",s)
-              if(ind==s){
-                ind = String.fromCharCode(countC+s);
-                newDiv.find('.CatalogContentMid #answ').append(ind+':'+newCont);
-                
-                if(it.correct == 1){
-                  console.log("correct:",s);
-
-                  $('.CatalogContentMid #answ dt:eq(s)').attr('id','correct');
-                }
-                console.log($('.CatalogContentMid #answ').find('dt'));
-                //$('.CatalogContentMid #answ dt#correct').css('color','red');
-              }
-            }
-          });
-        }
-      });*/
-
-
-
-
     });
   }
 

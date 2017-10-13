@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
@@ -238,6 +238,11 @@
         // 点击   保存并继续
         $('.btn_left').children().eq(0).on('click',function(event){
             save();
+            $('.Problemcontent .problemStem').val('');
+            $('.Answerpart_right textarea.choices').val('');
+            $('.Answerpart_left input:checked').removeAttr('checked');
+            $('.Problemcontent .problemStem').val('');
+            $('.Problemcontent #analysis').val('');
         });
         $('.btn_left').children().eq(1).on('click',function(event){
             save();
@@ -306,7 +311,6 @@
                 topic_id:subTopicId,
                 user_id:null
             }
-            console.log(correct);
             if(subTypeId==1 || subTypeId==2){
                 var correct = correct.toString();
                 console.log(correct);
@@ -348,8 +352,6 @@
                     }
                 });
             }
-            location.reload("");
         }
-
     });
 </script>

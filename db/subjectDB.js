@@ -30,7 +30,6 @@ module.exports = {
 		return pool.execute(sql);
 	},
 	// 保存题目
-	
 	saveSubject(subject){
 		var sql = "insert into tbl_exam_subject values(null,'"
 		+subject.analysis+"','"
@@ -44,14 +43,11 @@ module.exports = {
 		+subject.topic_id+",null)";
 		return pool.execute(sql);
 	},
+	// 保存选项
 	saveChoices(content,correct,sub_id){
-		console.log(content);
-		console.log(correct);
-		console.log(sub_id);
-		content.forEach(function(item,index){
-			var sql = 'insert into tbl_exam_choice values(null,"'+content[index]+'",'+correct[index]+','+sub_id+')';
-			return pool.execute(sql);
-		});
+		var correc = +correct;
+		var sql = "insert into tbl_exam_choice values(null,'"+content+"',"+correct+","+sub_id+")";
+		return pool.execute(sql);
 	},
 	getMaxId(){
 		var sql = 'select max(id) id from tbl_exam_subject';
@@ -86,7 +82,6 @@ module.exports = {
 		var sql = 'delete from tbl_exam_subject where id='+id;
 		return pool.execute(sql);
 	}
-
 }
 
 
